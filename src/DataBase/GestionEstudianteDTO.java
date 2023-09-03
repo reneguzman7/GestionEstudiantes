@@ -12,7 +12,7 @@ import Framework.AppException;
 
 public class GestionEstudianteDTO {
 
-    public List<Estudiante> cargarEstudiantes() throws AppException {
+    public List<Estudiante> cargarEstudiantes(int startIndex, int pageSize) throws AppException {
         List<Estudiante> estudiantes = new ArrayList<>();
     
         Connection conn = null;
@@ -22,8 +22,10 @@ public class GestionEstudianteDTO {
         try {
             conn = SQLiteDataHelper.openConnection(); // Abre la conexión aquí
     
-            String sql = "SELECT id, nombre, edad FROM Estudiante";
+            String sql = "SELECT id, nombre, edad FROM Estudiante LIMIT ? OFFSET ?";
             statement = conn.prepareStatement(sql);
+            statement.setInt(1, pageSize);
+            statement.setInt(2, startIndex * pageSize);
             resultSet = statement.executeQuery();
     
             while (resultSet.next()) {
@@ -42,8 +44,9 @@ public class GestionEstudianteDTO {
         return estudiantes;
     }
     
+    
 
-    public List<Curso> cargarCursos() throws AppException {
+    public List<Curso> cargarCursos(int startIndex, int pageSize) throws AppException {
         List<Curso> cursos = new ArrayList<>();
     
         Connection conn = null;
@@ -53,8 +56,10 @@ public class GestionEstudianteDTO {
         try {
             conn = SQLiteDataHelper.openConnection(); // Abre la conexión aquí
     
-            String sql = "SELECT id, nombre, descripcion FROM Curso";
+            String sql = "SELECT id, nombre, descripcion FROM Curso LIMIT ? OFFSET ?";
             statement = conn.prepareStatement(sql);
+            statement.setInt(1, pageSize);
+            statement.setInt(2, startIndex * pageSize);
             resultSet = statement.executeQuery();
     
             while (resultSet.next()) {
@@ -71,6 +76,58 @@ public class GestionEstudianteDTO {
         }
     
         return cursos;
+    }
+    
+    public int countEstudiantes() throws AppException {
+        int count = 0;
+    
+        Connection conn = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+    
+        try {
+            conn = SQLiteDataHelper.openConnection(); // Abre la conexión aquí
+    
+            String sql = "SELECT COUNT(*) FROM Estudiante";
+            statement = conn.prepareStatement(sql);
+            resultSet = statement.executeQuery();
+    
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new AppException(e, "GestionEstudianteDTO", "Fallo al contar los estudiantes en la base de datos");
+        } finally {
+            SQLiteDataHelper.closeResources(resultSet, statement, conn); // Cierra la conexión aquí
+        }
+    
+        return count;
+    }
+    
+    public int countCursos() throws AppException {
+        int count = 0;
+    
+        Connection conn = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+    
+        try {
+            conn = SQLiteDataHelper.openConnection(); // Abre la conexión aquí
+    
+            String sql = "SELECT COUNT(*) FROM Curso";
+            statement = conn.prepareStatement(sql);
+            resultSet = statement.executeQuery();
+    
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new AppException(e, "GestionEstudianteDTO", "Fallo al contar los cursos en la base de datos");
+        } finally {
+            SQLiteDataHelper.closeResources(resultSet, statement, conn); // Cierra la conexión aquí
+        }
+    
+        return count;
     }
     
     
