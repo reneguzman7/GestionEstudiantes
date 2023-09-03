@@ -19,9 +19,9 @@ public abstract class SQLiteDataHelper {
 
     public static synchronized Connection openConnection() throws AppException {
         try {
-            if (conn == null)
+            if (conn == null || conn.isClosed()) {
                 conn = DriverManager.getConnection(DBPathConnection);
-            // System.out.println("Connection to SQLite has been established.");
+            }
         } catch (SQLException e) {
             throw new AppException(e, "SQLiteDataHelper", "Fallo la coneccion a la base de datos");
         }

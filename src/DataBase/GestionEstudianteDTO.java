@@ -14,16 +14,18 @@ public class GestionEstudianteDTO {
 
     public List<Estudiante> cargarEstudiantes() throws AppException {
         List<Estudiante> estudiantes = new ArrayList<>();
-
-        Connection conn = SQLiteDataHelper.openConnection();
+    
+        Connection conn = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-
+    
         try {
+            conn = SQLiteDataHelper.openConnection(); // Abre la conexión aquí
+    
             String sql = "SELECT id, nombre, edad FROM Estudiante";
             statement = conn.prepareStatement(sql);
             resultSet = statement.executeQuery();
-
+    
             while (resultSet.next()) {
                 Estudiante estudiante = new Estudiante();
                 estudiante.setId(resultSet.getInt("id"));
@@ -34,21 +36,23 @@ public class GestionEstudianteDTO {
         } catch (SQLException e) {
             throw new AppException(e, "GestionEstudianteDTO", "Fallo al cargar los estudiantes desde la base de datos");
         } finally {
-            SQLiteDataHelper.closeResources(resultSet, statement, conn);
+            SQLiteDataHelper.closeResources(resultSet, statement, conn); // Cierra la conexión aquí
         }
-
+    
         return estudiantes;
     }
+    
 
     public List<Curso> cargarCursos() throws AppException {
         List<Curso> cursos = new ArrayList<>();
     
-        Connection conn = SQLiteDataHelper.openConnection(); // Abre la conexión
-    
+        Connection conn = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
     
         try {
+            conn = SQLiteDataHelper.openConnection(); // Abre la conexión aquí
+    
             String sql = "SELECT id, nombre, descripcion FROM Curso";
             statement = conn.prepareStatement(sql);
             resultSet = statement.executeQuery();
@@ -63,10 +67,11 @@ public class GestionEstudianteDTO {
         } catch (SQLException e) {
             throw new AppException(e, "GestionEstudianteDTO", "Fallo al cargar los cursos desde la base de datos");
         } finally {
-            SQLiteDataHelper.closeResources(resultSet, statement, conn); // Cierra la conexión
+            SQLiteDataHelper.closeResources(resultSet, statement, conn); // Cierra la conexión aquí
         }
     
         return cursos;
     }
+    
     
 }
