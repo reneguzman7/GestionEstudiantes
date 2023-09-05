@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import BusinessLogic.Estudiante;
 import BusinessLogic.Curso;
+import BusinessLogic.Inscripcion;
 import Framework.AppException;
 
 public class GestionEstudianteDTO {
@@ -129,6 +130,42 @@ public class GestionEstudianteDTO {
     
         return count;
     }
-    
-    
+
+    public List<Inscripcion> cargarInscripciones(int startIndex, int pageSize) throws AppException {
+        List<Inscripcion> inscripciones = new ArrayList<>();
+
+        Connection conn = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+
+        try {
+            conn = SQLiteDataHelper.openConnection(); // Open the connection here
+
+            String sql = "SELECT C.nombre AS curso_nombre, E.nombre AS estudiante_nombre " +
+                    "FROM Curso AS C " +
+                    "INNER JOIN Inscripcion AS I ON C.id = I.id_curso " +
+                    "INNER JOIN Estudiante AS E ON E.id = I.id_estudiante " +
+                    "LIMIT ? OFFSET ?";
+            statement = conn.prepareStatement(sql);
+            statement.setInt(1, pageSize);
+            statement.setInt(2, startIndex * pageSize);
+            resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Inscripcion inscripcion = new Inscripcion();
+                inscripcion.setIdCurso(Integer.parseInt(resultSet.getString("curso_nombre")));
+                inscripcion.setIdEstudiante(Integer.parseInt(resultSet.getString("estudiante_nombre")));
+                inscripciones.add(inscripcion);
+            }
+        } catch (SQLException e) {
+            throw new AppException(e, "GestionEstudianteDTO", "Fallo al cargar las inscripciones desde la base de datos");
+        } finally {
+            SQLiteDataHelper.closeResources(resultSet, statement, conn); // Close the connection here
+        }
+
+        return inscripciones;
+    }
+
+
+
 }
